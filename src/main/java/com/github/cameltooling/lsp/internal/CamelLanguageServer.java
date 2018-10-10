@@ -44,7 +44,7 @@ public class CamelLanguageServer extends AbstractLanguageServer implements Langu
 	
 	public CamelLanguageServer() {
 		super.setTextDocumentService(new CamelTextDocumentService(this));
-		super.setWorkspaceService(new CamelWorkspaceService());
+		super.setWorkspaceService(new CamelWorkspaceService(this));
 	}
 	
 	@Override

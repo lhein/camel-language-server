@@ -36,6 +36,16 @@ public class CamelWorkspaceService implements WorkspaceService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(CamelWorkspaceService.class);
 
+	private CamelLanguageServer camelLanguageServer;
+
+	/**
+	 * 
+	 * @param camelLanguageServer the camel language server to use
+	 */
+	public CamelWorkspaceService(CamelLanguageServer camelLanguageServer) {
+		this.camelLanguageServer = camelLanguageServer;
+	}
+	
 	@Override
 	public CompletableFuture<List<? extends SymbolInformation>> symbol(WorkspaceSymbolParams params) {
 		LOGGER.info("SERVER: symbolQuery: {}", params.getQuery());

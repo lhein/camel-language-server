@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.camel.catalog.CamelCatalog;
 import org.apache.camel.catalog.DefaultCamelCatalog;
@@ -52,6 +53,7 @@ import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.WorkspaceEdit;
+import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.slf4j.Logger;
@@ -76,9 +78,42 @@ public class CamelTextDocumentService implements TextDocumentService {
 
 	public CamelTextDocumentService(CamelLanguageServer camelLanguageServer) {
 		this.camelLanguageServer = camelLanguageServer;
-		camelCatalog = CompletableFuture.supplyAsync(() -> new DefaultCamelCatalog(true));
+		camelCatalog = CompletableFuture.supplyAsync( () -> initializeCamelCatalog());
 	}
 
+	private CamelCatalog initializeCamelCatalog() {
+		CamelCatalog catalog = new DefaultCamelCatalog(true);
+		try {
+			loadProjectCamelVersionCatalog();
+		} catch (InterruptedException | ExecutionException ex) {
+			LOGGER.warn("Uanble to retrieve loaded Camel Catalog version.", ex);
+			Thread.currentThread().interrupt();
+		}
+		return catalog;
+	}
+	
+	private void loadProjectCamelVersionCatalog() throws InterruptedException, ExecutionException {
+		System.err.println("1");
+		String loadedVersion = camelCatalog.join().getLoadedVersion();
+		System.err.println("2");
+		String projectVersion = retrieveProjectCamelVersion();
+		System.err.println("3");
+		if (!loadedVersion.equalsIgnoreCase(projectVersion) ) {
+			camelCatalog.get().loadVersion(projectVersion);
+		}
+	}
+
+	private String retrieveProjectCamelVersion() throws InterruptedException, ExecutionException {
+		CompletableFuture<List<WorkspaceFolder>> folders = camelLanguageServer.getClient().workspaceFolders();
+		
+		for (WorkspaceFolder folder : folders.get()) {
+			LOGGER.error(folder.getName() + " - " + folder.getUri());
+			System.err.println(folder.getName() + " - " + folder.getUri());
+		}
+		
+		return camelCatalog.get().getLoadedVersion();
+	}
+	
 	@Override
 	public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams completionParams) {
 		String uri = completionParams.getTextDocument().getUri();
