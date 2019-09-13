@@ -59,6 +59,7 @@
 		<camel.tooling.common.version>0.0.3-SNAPSHOT</camel.tooling.common.version>
 		<roaster.version>2.20.1.Final</roaster.version>
 		<awaitility.version>4.0.1</awaitility.version>
+		<snake.yaml.version>1.25</snake.yaml.version>
 	</properties>
 
 	<distributionManagement>
@@ -308,7 +309,7 @@
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
-			<version>1.21</version>            
+			<version>${snake.yaml.version}</version>            
 		</dependency>
 	</dependencies>
 	
