@@ -39,7 +39,7 @@ public class CamelKYamlDSLParser extends ParserFileHelper {
 	@Override
 	public String getCamelComponentUri(String line, int characterPosition) {
 		String camelComponentURI = null;
-		Map data = parseYaml(line);
+		Map<?,?> data = parseYaml(line);
 		if (data.containsKey(URI_KEY) && URI_KEY.length() < characterPosition) {
 			camelComponentURI = data.get(URI_KEY).toString();
 		} else if(data.containsKey(TO_KEY) && data.get(TO_KEY).toString().trim().length()>0) {
@@ -73,7 +73,7 @@ public class CamelKYamlDSLParser extends ParserFileHelper {
 	public String getCorrespondingType(TextDocumentItem textDocumentItem, int lineNumber) {
 		for (int lineNo = lineNumber; lineNo >=0; lineNo--) {
 			String tempLine = parserFileHelperUtil.getLine(textDocumentItem, lineNo);
-			Map data = parseYaml(tempLine);
+			Map<?,?> data = parseYaml(tempLine);
 			if (data.containsKey(TO_KEY)) {
 				return "to";
 			} else if (data.containsKey(FROM_KEY)) {
@@ -85,7 +85,7 @@ public class CamelKYamlDSLParser extends ParserFileHelper {
 		return null;
 	}
 
-	private Map parseYaml(String line) {
+	private Map<?,?> parseYaml(String line) {
 		Yaml yaml = new Yaml();
 		Object obj = yaml.load(line);
 		return extractMapFromYaml(obj);
@@ -94,18 +94,18 @@ public class CamelKYamlDSLParser extends ParserFileHelper {
 	private String extractUriFromYamlData(String line) {
 		Yaml yaml = new Yaml();
 		Object obj = yaml.load(line);
-		Map m = extractMapFromYaml(obj);
+		Map<?,?> m = extractMapFromYaml(obj);
 		return (String)m.values().toArray()[0];
 	}
 
-	private Map extractMapFromYaml(Object o) {
+	private Map<?,?> extractMapFromYaml(Object o) {
 		if (o instanceof List) {
-			List l = (List)o;
+			List<?> l = (List<?>)o;
 			if (l.get(0) instanceof Map) {
-				return (Map)l.get(0);
+				return (Map<?,?>)l.get(0);
 			}
 		} else if (o instanceof Map) {
-			return (Map)o;
+			return (Map<?,?>)o;
 		}
 		return null;
 	}
